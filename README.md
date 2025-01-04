@@ -1,2 +1,1 @@
-# dual-guided-minimum-correlation-point-seeding-algorithm
-Code in “Thermally Guided Streamline Placement for Joint Flow and Scalar Field Visualization”
+[English](./docs/en/README-en.md) | [中文](./docs/zh/README-zh.md)
