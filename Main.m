@@ -1,6 +1,6 @@
 %% addpath
 addpath(genpath('Common'));
-addpath(genpath('DataSet'));
+addpath(genpath('Dataset'));
 addpath(genpath('Tools For Graph'));
 addpath(genpath('Thermal Diffusion'));
 addpath(genpath('Tools For Evaluation'));
