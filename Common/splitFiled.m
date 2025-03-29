@@ -40,6 +40,9 @@ buildKDTree_recurse(Data, IndexMat, []);
         XData = sum(CurrentData, [1, 3]);
         YData = sum(CurrentData, [2, 3]);
         ZData = sum(CurrentData, [1, 2]);
+        % 该算法存在进一步优化空间。通过预计算三维前缀和数组，可借助差分查询机制以$O(1)$时间获取任意子块和值
+        % The algorithm can be further optimized. 
+        % By pre-calculating the three-dimensional prefix sum array, any sub-block and value can be obtained in $O(1)$ time using the differential query mechanism.
         SizeVec = [size(CurrentData, 1), size(CurrentData, 2), size(CurrentData, 3)];
         % 先划分长的那一边，如果差不多一样长则先按照最小误差原则选择划分维度
         % Divide the longer side first. If they are almost the same length, choose the dimension to divide according to the principle of minimum error.
@@ -125,6 +128,9 @@ buildKDTree_recurse(Data, IndexMat, []);
         % Data dimensionality reduction
         XData = sum(CurrentData, 1);
         YData = sum(CurrentData, 2);
+        % 该算法存在进一步优化空间。通过预计算二维前缀和数组，可借助差分查询机制以$O(1)$时间获取任意子块和值
+        % The algorithm can be further optimized. 
+        % By pre-calculating the two-dimensional prefix sum array, any sub-block and value can be obtained in $O(1)$ time using the differential query mechanism.
         % 先划分长的那一边，如果差不多一样长则先按照最小误差原则选择划分维度
         % Divide the longer side first. If they are almost the same length, choose the dimension to divide according to the principle of minimum error.
         if size(CurrentData, 1) > size(CurrentData, 2) * MaximumAspectRatio
@@ -172,17 +178,23 @@ buildKDTree_recurse(Data, IndexMat, []);
 end
 %% 将一维数组分成尽量均匀的两半（两个左闭右开区间，Mid处元素位于右区间内）
 %% Divide the one-dimensional array into two halves as evenly as possible (two left closed and right open intervals, the element at Mid is in the right interval)
-function Result = divideArrayIntoHalf(array)
+function split_pos = divideArrayIntoHalf(array)
 L = length(array);
-First = 1;
-Last = L;
-while First < Last
-    Mid = First + floor((Last - First) / 2);
-    if sum(array(1:Mid)) < sum(array(Mid:L))
-        First = Mid + 1 ;
+array = array(:)';
+% 该算法存在进一步优化空间。可以预计算整个场的前缀和数组，避免每次调用都计算前缀和。
+% The algorithm can be further optimized. The prefix sum array of the entire field can be pre-calculated to avoid calculating the prefix sum for each call.
+S = [0, cumsum(array)];
+low = 1; 
+high = L;
+while low < high
+    mid = floor((low + high)/2);
+    left_sum = S(mid + 1) - S(1);
+    right_sum = S(end) - S(mid + 1 - 1); 
+    if left_sum < right_sum
+        low = mid + 1;
     else
-        Last = Mid ;
+        high = mid;
     end
 end
-Result = First;
+split_pos = low;
 end
